@@ -2,22 +2,11 @@
 import sys
 
 def factorial(n):
-    if n < 0:
-        return -1
     result = 1
-    while n > 0:
+    while n > 1:
         result *= n
-        n -= 1
+        n -= 1  # Décrémente la valeur de n à chaque itération
     return result
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python3 factorial.py <number>")
-        sys.exit(1)
-
-    n = int(sys.argv[1])
-    result = factorial(n)
-    if result == -1:
-        print("Le nombre doit être supérieur ou égal à zéro.")
-    else:
-        print(f"Le facteuriel de {n} est {result}.")
+f = factorial(int(sys.argv[1]))
+print(f)
