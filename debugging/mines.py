@@ -12,6 +12,7 @@ class Minesweeper:
         self.mines = set(random.sample(range(width * height), mines))
         self.field = [[' ' for _ in range(width)] for _ in range(height)]
         self.revealed = [[False for _ in range(width)] for _ in range(height)]
+        self.won = False
 
     def print_board(self, reveal=False):
         clear_screen()
@@ -48,21 +49,34 @@ class Minesweeper:
                 for dy in [-1, 0, 1]:
                     nx, ny = x + dx, y + dy
                     if 0 <= nx < self.width and 0 <= ny < self.height and not self.revealed[ny][nx]:
-                        self.reveal(nx, ny)
+                        if self.reveal(nx, ny):
+                            self.check_win()
         return True
+
+    def check_win(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                if not self.revealed[y][x] and (y * self.width + x) not in self.mines:
+                    return
+        self.won = True
 
     def play(self):
         while True:
             self.print_board()
             try:
-                x = int(input("Enter x coordinate: "))
-                y = int(input("Enter y coordinate: "))
+                x = int(input("Saisir la coordonnée x : "))
+                y = int(input("Saisir la coordonnée y : "))
                 if not self.reveal(x, y):
                     self.print_board(reveal=True)
-                    print("Game Over! You hit a mine.")
+                    print("Game Over! Vous avez heurté une mine.")
+                    break
+                elif self.won:
+                    self.print_board(reveal=True)
+                    print("Félicitations ! Vous avez gagné.")
                     break
             except ValueError:
-                print("Invalid input. Please enter numbers only.")
+                input("Entrée invalide. Appuyez sur Entrée pour continuer.")
+				
 
 if __name__ == "__main__":
     game = Minesweeper()
