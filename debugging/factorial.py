@@ -10,6 +10,6 @@ def factorial(n):
 
 if len(sys.argv) > 1:
     f = factorial(int(sys.argv[1]))
-    print(f"La factorielle de {sys.argv[1]} est: {f}")
+    print(f"The factorial of {sys.argv[1]} is: {f}")
 else:
-    print("Veuillez fournir un argument.")
+    print("Please provide an argument.")

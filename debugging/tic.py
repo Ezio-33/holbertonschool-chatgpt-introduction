@@ -4,10 +4,12 @@ PLAYER_X = "X"
 PLAYER_O = "O"
 EMPTY_CELL = " "
 
+
 def print_board(board):
     for row in board:
         print(" | ".join(row))
         print("-" * 5)
+
 
 def check_winner(board):
     for row in board:
@@ -15,16 +17,20 @@ def check_winner(board):
             return True
 
     for col in range(len(board[0])):
-        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != EMPTY_CELL:
+        if (board[0][col] == board[1][col] == board[2][col] and
+                board[0][col] != EMPTY_CELL):
             return True
 
-    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != EMPTY_CELL:
+    if (board[0][0] == board[1][1] == board[2][2] and
+            board[0][0] != EMPTY_CELL):
         return True
 
-    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != EMPTY_CELL:
+    if (board[0][2] == board[1][1] == board[2][0] and
+            board[0][2] != EMPTY_CELL):
         return True
 
     return False
+
 
 def is_full(board):
     for row in board:
@@ -32,8 +38,10 @@ def is_full(board):
             return False
     return True
 
+
 def switch_player(current_player):
     return PLAYER_O if current_player == PLAYER_X else PLAYER_X
+
 
 def tic_tac_toe():
     board = [[EMPTY_CELL]*3 for _ in range(3)]
@@ -43,7 +51,8 @@ def tic_tac_toe():
         print_board(board)
         try:
             row = int(input(f"Enter row (0, 1, or 2) for player {player}: "))
-            col = int(input(f"Enter column (0, 1, or 2) for player {player}: "))
+            col = int(input(
+                f"Enter column (0, 1, or 2) for player {player}: "))
             if row not in [0, 1, 2] or col not in [0, 1, 2]:
                 print("Invalid input. Please enter 0, 1, or 2.")
                 continue
@@ -64,5 +73,6 @@ def tic_tac_toe():
             player = switch_player(player)
         else:
             print("That spot is already taken! Try again.")
+
 
 tic_tac_toe()
