@@ -1,54 +1,95 @@
 #!/usr/bin/python3
 import random
+import os
+
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 
 class Minesweeper:
     def __init__(self, width=10, height=10, mines=10):
         self.width = width
         self.height = height
         self.mines = set(random.sample(range(width * height), mines))
-        self.board = [[' ' for _ in range(width)] for _ in range(height)]
-        self.total_non_mine_cells = width * height - mines
-        self.non_mine_cells_revealed = 0
+        self.field = [[' ' for _ in range(width)] for _ in range(height)]
+        self.revealed = [[False for _ in range(width)] for _ in range(height)]
+        self.won = False
 
     def print_board(self, reveal=False):
-        print('  ', end='')
-        for i in range(self.width):
-            print(i, end=' ')
-        print()
+        clear_screen()
+        print('  ' + ' '.join(str(i) for i in range(self.width)))
         for y in range(self.height):
             print(y, end=' ')
             for x in range(self.width):
-                if reveal or (x, y) in self.mines:
-                    print('.', end=' ')
+                if reveal or self.revealed[y][x]:
+                    if (y * self.width + x) in self.mines:
+                        print('*', end=' ')
+                    else:
+                        count = self.count_mines_nearby(x, y)
+                        print(count if count > 0 else ' ', end=' ')
                 else:
-                    print(self.board[y][x], end=' ')
+                    print('.', end=' ')
             print()
 
+    def count_mines_nearby(self, x, y):
+        count = 0
+        for dx in [-1, 0, 1]:
+            for dy in [-1, 0, 1]:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < self.width and 0 <= ny < self.height:
+                    if (ny * self.width + nx) in self.mines:
+                        count += 1
+        return count
+
     def reveal(self, x, y):
-        if (x, y) in self.mines:
+        if (y * self.width + x) in self.mines:
             return False
-        count = sum(1 for i in range(max(0, x-1), min(self.width, x+2))
-                     for j in range(max(0, y-1), min(self.height, y+2))
-                     if (i, j) in self.mines)
-        self.board[y][x] = count
-        self.non_mine_cells_revealed += 1
+        self.revealed[y][x] = True
+        if self.count_mines_nearby(x, y) == 0:
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    nx, ny = x + dx, y + dy
+                    if (
+                         0 <= nx < self.width and 0 <= ny < self.height
+                         and not self.revealed[ny][nx]
+                    ):
+                        self.reveal(nx, ny)
+        self.check_win()
         return True
+
+    def check_win(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                if (
+                    not self.revealed[y][x]
+                    and (y * self.width + x) not in self.mines
+                ):
+                    return
+        self.won = True
 
     def play(self):
         while True:
             self.print_board()
             try:
-                x = int(input("Entrez la coordonnée x: "))
-                y = int(input("Entrez la coordonnée y: "))
-                if self.reveal(x, y):
-                    if self.non_mine_cells_revealed == self.total_non_mine_cells:
-                        self.print_board(reveal=True)
-                        print("Félicitations ! Vous avez gagné le jeu.")
-                        break
+                x = int(input("Saisir la coordonnée x : "))
+                y = int(input("Saisir la coordonnée y : "))
+                if x < 0 or x >= self.width or y < 0 or y >= self.height:
+                    input("Coordonnées hors du plateau. "
+                          "Appuyez sur Entrée pour continuer.")
+                    continue
+                if not self.reveal(x, y):
+                    self.print_board(reveal=True)
+                    print("Game Over! Vous avez heurté une mine.")
+                    break
+                elif self.won:
+                    self.print_board(reveal=True)
+                    print("Félicitations ! Vous avez gagné.")
+                    break
             except ValueError:
-                print("Veuillez entrer des coordonnées valides.")
+                input("Entrée invalide. Appuyez sur Entrée pour continuer.")
 
 
-# Exemple d'utilisation
-minesweeper = Minesweeper()
-minesweeper.play()
+if __name__ == "__main__":
+    game = Minesweeper()
+    game.play()
